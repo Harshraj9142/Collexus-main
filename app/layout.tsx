@@ -5,6 +5,7 @@ import { GeistMono } from "geist/font/mono"
 import { Analytics } from "@vercel/analytics/next"
 import { ThemeProvider } from "@/components/theme-provider"
 import { AuthProvider } from "@/components/providers/session-provider"
+import { SocketProvider } from "@/components/providers/socket-provider"
 import { Suspense } from "react"
 import "./globals.css"
 
@@ -24,9 +25,11 @@ export default function RootLayout({
       <body className={`font-sans ${GeistSans.variable} ${GeistMono.variable}`}>
         <Suspense fallback={null}>
           <AuthProvider>
-            <ThemeProvider attribute="class" defaultTheme="light" enableSystem disableTransitionOnChange>
-              {children}
-            </ThemeProvider>
+            <SocketProvider>
+              <ThemeProvider attribute="class" defaultTheme="light" enableSystem disableTransitionOnChange>
+                {children}
+              </ThemeProvider>
+            </SocketProvider>
           </AuthProvider>
         </Suspense>
         <Analytics />

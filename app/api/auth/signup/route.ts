@@ -68,6 +68,16 @@ export async function POST(request: NextRequest) {
 
       const newUser = await userModel.createUser(userData)
 
+      // Emit real-time update if user is a student
+      if (role === 'student') {
+        try {
+          const { emitStudentCountUpdate } = await import('@/lib/socket')
+          await emitStudentCountUpdate()
+        } catch (socketError) {
+          console.log('Socket.IO not available for real-time updates:', socketError)
+        }
+      }
+
       // Return user without password
       // eslint-disable-next-line @typescript-eslint/no-unused-vars
       const { password: _password, ...userWithoutPassword } = newUser

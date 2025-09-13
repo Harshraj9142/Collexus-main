@@ -1,6 +1,8 @@
 "use client"
 
 import { useState } from "react"
+import { useStudentCount } from "@/hooks/use-student-count"
+import { StudentCountTest } from "@/components/admin/student-count-test"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
@@ -127,6 +129,7 @@ const mockAdminData = {
 export function AdminDashboard() {
   const user = getCurrentUser()
   const [selectedDepartment, setSelectedDepartment] = useState("all")
+  const { studentCount, isLoading: isLoadingCount, error: countError, isConnected } = useStudentCount()
 
   const handleApproval = (id: string, action: "approve" | "reject") => {
     console.log(`${action} application ${id}`)
@@ -150,11 +153,33 @@ export function AdminDashboard() {
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">Total Students</CardTitle>
-            <Users className="h-4 w-4 text-muted-foreground" />
+            <div className="flex items-center gap-2">
+              <Users className="h-4 w-4 text-muted-foreground" />
+              {isConnected && (
+                <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse" title="Real-time updates active" />
+              )}
+            </div>
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">{mockAdminData.stats.totalStudents.toLocaleString()}</div>
-            <p className="text-xs text-muted-foreground">+{mockAdminData.stats.pendingAdmissions} pending admissions</p>
+            <div className="text-2xl font-bold">
+              {isLoadingCount ? (
+                <div className="animate-pulse bg-muted h-8 w-16 rounded" />
+              ) : countError ? (
+                <span className="text-red-500">Error</span>
+              ) : (
+                studentCount.toLocaleString()
+              )}
+            </div>
+            <p className="text-xs text-muted-foreground">
+              {isConnected ? (
+                <>Real-time count • +{mockAdminData.stats.pendingAdmissions} pending admissions</>
+              ) : (
+                <>+{mockAdminData.stats.pendingAdmissions} pending admissions</>
+              )}
+            </p>
+            {countError && (
+              <p className="text-xs text-red-500 mt-1">{countError}</p>
+            )}
           </CardContent>
         </Card>
 
@@ -198,12 +223,25 @@ export function AdminDashboard() {
 
       {/* Main Content Tabs */}
       <Tabs defaultValue="overview" className="space-y-4">
-        <TabsList className="grid w-full grid-cols-4">
+        <TabsList className="grid w-full grid-cols-5">
           <TabsTrigger value="overview">Overview</TabsTrigger>
+          <TabsTrigger value="realtime">Real-time Test</TabsTrigger>
           <TabsTrigger value="approvals">Pending Approvals</TabsTrigger>
           <TabsTrigger value="analytics">Analytics</TabsTrigger>
           <TabsTrigger value="notifications">Notifications</TabsTrigger>
         </TabsList>
+
+        <TabsContent value="realtime" className="space-y-4">
+          <div className="space-y-6">
+            <div>
+              <h3 className="text-lg font-semibold mb-2">Real-time Student Count Testing</h3>
+              <p className="text-muted-foreground">
+                Test the real-time functionality by creating new students and watching the count update instantly.
+              </p>
+            </div>
+            <StudentCountTest />
+          </div>
+        </TabsContent>
 
         <TabsContent value="overview" className="space-y-4">
           <div className="grid gap-4 md:grid-cols-2">
