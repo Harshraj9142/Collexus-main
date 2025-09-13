@@ -96,12 +96,8 @@ export const authOptions: NextAuthOptions = {
               return null
             }
 
-            // For demo users, we'll use simple password comparison
-            // In production, you should always hash passwords
-            const isValidPassword = credentials.password === 'student123' || 
-                                  credentials.password === 'faculty123' || 
-                                  credentials.password === 'admin123' || 
-                                  credentials.password === 'parent123'
+            // For demo users, validate password properly
+            const isValidPassword = await bcrypt.compare(credentials.password, user.password)
 
             if (!isValidPassword) {
               return null

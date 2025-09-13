@@ -24,7 +24,7 @@ export function LoginForm() {
   const searchParams = useSearchParams()
 
   useEffect(() => {
-    const message = searchParams.get('message')
+    const message = searchParams?.get('message')
     if (message) {
       setSuccessMessage(message)
     }
@@ -60,26 +60,6 @@ export function LoginForm() {
     }
   }
 
-  const quickLogin = async (role: UserRole) => {
-    const emails = {
-      student: "student@college.edu",
-      faculty: "faculty@college.edu",
-      admin: "admin@college.edu",
-      parent: "parent@college.edu",
-    }
-
-    setEmail(emails[role])
-    setPassword("password")
-    setSelectedRole(role)
-    
-    // Auto-submit the form
-    setTimeout(() => {
-      const form = document.querySelector('form')
-      if (form) {
-        form.requestSubmit()
-      }
-    }, 100)
-  }
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-background p-4">
@@ -173,47 +153,6 @@ export function LoginForm() {
             </Button>
           </form>
 
-          <div className="mt-6">
-            <div className="text-sm text-muted-foreground text-center mb-3">Quick login for demo:</div>
-            <div className="grid grid-cols-2 gap-2">
-              <Button 
-                variant="outline" 
-                size="sm" 
-                onClick={() => quickLogin("student")} 
-                className="text-xs"
-                disabled={isLoading}
-              >
-                Student Demo
-              </Button>
-              <Button 
-                variant="outline" 
-                size="sm" 
-                onClick={() => quickLogin("faculty")} 
-                className="text-xs"
-                disabled={isLoading}
-              >
-                Faculty Demo
-              </Button>
-              <Button 
-                variant="outline" 
-                size="sm" 
-                onClick={() => quickLogin("admin")} 
-                className="text-xs"
-                disabled={isLoading}
-              >
-                Admin Demo
-              </Button>
-              <Button 
-                variant="outline" 
-                size="sm" 
-                onClick={() => quickLogin("parent")} 
-                className="text-xs"
-                disabled={isLoading}
-              >
-                Parent Demo
-              </Button>
-            </div>
-          </div>
 
           <div className="mt-6 text-center">
             <p className="text-sm text-muted-foreground">
