@@ -1,5 +1,5 @@
 export type UserRole = "student" | "faculty" | "admin" | "parent"
-export type AdminSubRole = "financial" | "academic" | "hostel"
+export type AdminSubRole = "financial" | "academic" | "hostel" | "library"
 
 export interface User {
   id: string
@@ -9,9 +9,3 @@ export interface User {
   adminSubRole?: AdminSubRole
   avatar?: string
 }
-
-
-
-
-
-

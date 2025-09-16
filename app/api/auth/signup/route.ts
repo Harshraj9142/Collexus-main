@@ -25,7 +25,7 @@ export async function POST(request: NextRequest) {
 
     // Validate admin sub-role if role is admin
     if (role === 'admin') {
-      const validAdminSubRoles: AdminSubRole[] = ['financial', 'academic', 'hostel']
+      const validAdminSubRoles: AdminSubRole[] = ['financial', 'academic', 'hostel', 'library']
       if (!adminSubRole || !validAdminSubRoles.includes(adminSubRole)) {
         return NextResponse.json(
           { error: 'Valid admin sub-role is required for admin users' },

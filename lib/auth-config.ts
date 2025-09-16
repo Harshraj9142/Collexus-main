@@ -49,6 +49,15 @@ const demoUsers = [
     avatar: '/admin-avatar.png'
   },
   {
+    id: '7',
+    name: 'Library Admin',
+    email: 'library@demo.com',
+    password: '$2a$12$LQv3c1yqBWVHxkd0LHAkCOYz6TtxMQJqhN8/LewdBPj4J/8K5K5K2', // password: admin123
+    role: 'admin' as UserRole,
+    adminSubRole: 'library' as AdminSubRole,
+    avatar: '/admin-avatar.png'
+  },
+  {
     id: '4',
     name: 'Parent User',
     email: 'parent@demo.com',

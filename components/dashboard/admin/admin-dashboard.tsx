@@ -41,6 +41,7 @@ import {
 import { FinancialDashboard } from "./financial-dashboard"
 import { AcademicDashboard } from "./academic-dashboard"
 import { HostelDashboard } from "./hostel-dashboard"
+import { LibraryDashboard } from "./library-dashboard"
 
 // Mock data for admin dashboard
 const mockAdminData = {
@@ -150,6 +151,10 @@ export function AdminDashboard() {
   
   if (session?.user?.adminSubRole === 'hostel') {
     return <HostelDashboard />
+  }
+
+  if (session?.user?.adminSubRole === 'library') {
+    return <LibraryDashboard />
   }
 
   const handleApproval = (id: string, action: "approve" | "reject") => {

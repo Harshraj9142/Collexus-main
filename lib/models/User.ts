@@ -3,7 +3,7 @@ import bcrypt from 'bcryptjs'
 import { randomUUID } from 'crypto'
 
 export type UserRole = "student" | "faculty" | "admin" | "parent"
-export type AdminSubRole = "financial" | "academic" | "hostel"
+export type AdminSubRole = "financial" | "academic" | "hostel" | "library"
 
 export interface User {
   _id?: string
