@@ -1,12 +1,15 @@
 "use client"
 
 import React, { useState } from 'react'
+import { useSession } from "next-auth/react"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { Progress } from "@/components/ui/progress"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
+import { Input } from "@/components/ui/input"
 import { 
   GraduationCap, 
   Users, 
@@ -26,7 +29,22 @@ import {
   Search,
   Bell,
   Award,
-  Target
+  Target,
+  UserPlus,
+  Edit,
+  Trash2,
+  Eye,
+  Plus,
+  Settings,
+  ChevronRight,
+  Building2,
+  BookMarked,
+  Users2,
+  CalendarDays,
+  FileCheck,
+  XCircle,
+  Star,
+  MessageSquare
 } from 'lucide-react'
 
 // Mock data for academic dashboard
@@ -100,7 +118,10 @@ const mockAcademicData = {
 }
 
 export function AcademicDashboard() {
+  const { data: session } = useSession()
   const [selectedTimeRange, setSelectedTimeRange] = useState('monthly')
+  const [selectedDepartment, setSelectedDepartment] = useState('all')
+  const [searchQuery, setSearchQuery] = useState('')
 
   const formatNumber = (num: number) => {
     return new Intl.NumberFormat('en-IN').format(num)
@@ -116,23 +137,13 @@ export function AcademicDashboard() {
   }
 
   return (
-    <div className="p-6 space-y-6 bg-gray-50 min-h-screen">
-      {/* Header */}
-      <div className="flex justify-between items-center">
-        <div>
-          <h1 className="text-3xl font-bold text-gray-900">Academic Dashboard</h1>
-          <p className="text-gray-600 mt-1">Comprehensive academic management and analytics</p>
-        </div>
-        <div className="flex gap-3">
-          <Button variant="outline" size="sm">
-            <Download className="h-4 w-4 mr-2" />
-            Export Report
-          </Button>
-          <Button variant="outline" size="sm">
-            <RefreshCw className="h-4 w-4 mr-2" />
-            Refresh
-          </Button>
-        </div>
+    <div className="space-y-6">
+      {/* Welcome Section */}
+      <div className="flex flex-col gap-2">
+        <h1 className="text-3xl font-bold text-balance">Academic Dashboard</h1>
+        <p className="text-muted-foreground text-pretty">
+          Welcome, {session?.user?.name}! Manage academic operations, student records, and educational analytics.
+        </p>
       </div>
 
       {/* Key Metrics Overview */}
@@ -194,118 +205,107 @@ export function AcademicDashboard() {
       </div>
 
       {/* Main Content Tabs */}
-      <Tabs defaultValue="admissions" className="space-y-6">
-        <TabsList className="grid w-full grid-cols-4">
-          <TabsTrigger value="admissions">Admissions</TabsTrigger>
+      <Tabs defaultValue="overview" className="space-y-4">
+        <TabsList className="grid w-full grid-cols-6">
+          <TabsTrigger value="overview">Overview</TabsTrigger>
+          <TabsTrigger value="students">Students</TabsTrigger>
+          <TabsTrigger value="courses">Courses</TabsTrigger>
           <TabsTrigger value="examinations">Examinations</TabsTrigger>
-          <TabsTrigger value="academic-records">Academic Records</TabsTrigger>
           <TabsTrigger value="analytics">Analytics</TabsTrigger>
+          <TabsTrigger value="notifications">Notifications</TabsTrigger>
         </TabsList>
 
-        {/* Admissions Tab */}
-        <TabsContent value="admissions" className="space-y-6">
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-            {/* Applications Overview */}
+        <TabsContent value="overview" className="space-y-4">
+          <div className="grid gap-4 md:grid-cols-2">
             <Card>
               <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <FileText className="h-5 w-5" />
-                  Applications Overview
-                </CardTitle>
-                <CardDescription>Today's and overall application statistics</CardDescription>
+                <CardTitle>Academic Overview</CardTitle>
+                <CardDescription>Key academic metrics and statistics</CardDescription>
               </CardHeader>
               <CardContent>
                 <div className="space-y-4">
                   <div className="grid grid-cols-2 gap-4">
                     <div className="bg-blue-50 p-4 rounded-lg border border-blue-200">
-                      <div className="text-sm text-blue-600 font-medium">Today</div>
-                      <div className="text-2xl font-bold text-blue-700">{mockAcademicData.admissions.totalApplications.today}</div>
-                      <div className="text-xs text-blue-500">New applications</div>
+                      <div className="text-sm text-blue-600 font-medium">Total Students</div>
+                      <div className="text-2xl font-bold text-blue-700">{formatNumber(mockAcademicData.academicRecords.totalActiveStudents)}</div>
+                      <div className="text-xs text-blue-500">Active enrollment</div>
                     </div>
                     <div className="bg-green-50 p-4 rounded-lg border border-green-200">
-                      <div className="text-sm text-green-600 font-medium">Overall</div>
-                      <div className="text-2xl font-bold text-green-700">{formatNumber(mockAcademicData.admissions.totalApplications.overall)}</div>
-                      <div className="text-xs text-green-500">Total applications</div>
+                      <div className="text-sm text-green-600 font-medium">Pass Rate</div>
+                      <div className="text-2xl font-bold text-green-700">95.3%</div>
+                      <div className="text-xs text-green-500">Current semester</div>
                     </div>
                   </div>
                   <div className="grid grid-cols-2 gap-4">
                     <div className="bg-orange-50 p-4 rounded-lg border border-orange-200">
                       <div className="text-sm text-orange-600 font-medium">Pending</div>
                       <div className="text-2xl font-bold text-orange-700">{mockAcademicData.admissions.pendingVerifications}</div>
-                      <div className="text-xs text-orange-500">Verifications</div>
+                      <div className="text-xs text-orange-500">Applications</div>
                     </div>
-                    <div className="bg-red-50 p-4 rounded-lg border border-red-200">
-                      <div className="text-sm text-red-600 font-medium">Missing</div>
-                      <div className="text-2xl font-bold text-red-700">{mockAcademicData.admissions.missingDocuments}</div>
-                      <div className="text-xs text-red-500">Documents</div>
+                    <div className="bg-purple-50 p-4 rounded-lg border border-purple-200">
+                      <div className="text-sm text-purple-600 font-medium">Upcoming</div>
+                      <div className="text-2xl font-bold text-purple-700">{mockAcademicData.examinations.upcomingExams.length}</div>
+                      <div className="text-xs text-purple-500">Examinations</div>
                     </div>
                   </div>
                 </div>
               </CardContent>
             </Card>
 
-            {/* Demographics Overview */}
             <Card>
               <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <BarChart3 className="h-5 w-5" />
-                  Demographics Overview
-                </CardTitle>
-                <CardDescription>Student demographics breakdown</CardDescription>
+                <CardTitle>Recent Activities</CardTitle>
+                <CardDescription>Latest academic activities and updates</CardDescription>
               </CardHeader>
               <CardContent>
-                <div className="space-y-4">
-                  <div>
-                    <div className="flex justify-between items-center mb-2">
-                      <span className="text-sm font-medium">Gender Ratio</span>
+                <div className="space-y-3">
+                  <div className="flex items-center gap-3 p-3 rounded-lg bg-muted/50">
+                    <div className="w-2 h-2 bg-green-500 rounded-full"></div>
+                    <div className="flex-1">
+                      <p className="text-sm font-medium">New student registrations</p>
+                      <p className="text-xs text-muted-foreground">15 new applications today</p>
                     </div>
-                    <div className="grid grid-cols-2 gap-2">
-                      <div className="bg-blue-100 p-2 rounded text-center">
-                        <div className="text-sm font-semibold text-blue-700">Male: {mockAcademicData.admissions.demographics.genderRatio.male}%</div>
-                      </div>
-                      <div className="bg-pink-100 p-2 rounded text-center">
-                        <div className="text-sm font-semibold text-pink-700">Female: {mockAcademicData.admissions.demographics.genderRatio.female}%</div>
-                      </div>
-                    </div>
+                    <span className="text-xs text-muted-foreground">2h ago</span>
                   </div>
-                  <div>
-                    <div className="flex justify-between items-center mb-2">
-                      <span className="text-sm font-medium">Domicile Status</span>
+                  <div className="flex items-center gap-3 p-3 rounded-lg bg-muted/50">
+                    <div className="w-2 h-2 bg-blue-500 rounded-full"></div>
+                    <div className="flex-1">
+                      <p className="text-sm font-medium">Exam results published</p>
+                      <p className="text-xs text-muted-foreground">Database Systems - Semester 6</p>
                     </div>
-                    <div className="grid grid-cols-2 gap-2">
-                      <div className="bg-green-100 p-2 rounded text-center">
-                        <div className="text-sm font-semibold text-green-700">Local: {mockAcademicData.admissions.demographics.domicile.local}%</div>
-                      </div>
-                      <div className="bg-yellow-100 p-2 rounded text-center">
-                        <div className="text-sm font-semibold text-yellow-700">Out-of-State: {mockAcademicData.admissions.demographics.domicile.outOfState}%</div>
-                      </div>
+                    <span className="text-xs text-muted-foreground">4h ago</span>
+                  </div>
+                  <div className="flex items-center gap-3 p-3 rounded-lg bg-muted/50">
+                    <div className="w-2 h-2 bg-orange-500 rounded-full"></div>
+                    <div className="flex-1">
+                      <p className="text-sm font-medium">Document verification pending</p>
+                      <p className="text-xs text-muted-foreground">89 students require attention</p>
                     </div>
+                    <span className="text-xs text-muted-foreground">6h ago</span>
                   </div>
                 </div>
               </CardContent>
             </Card>
           </div>
 
-          {/* Program-wise Admissions */}
           <Card>
             <CardHeader>
-              <CardTitle>Confirmed Admissions by Program</CardTitle>
-              <CardDescription>Distribution of confirmed admissions across programs</CardDescription>
+              <CardTitle>Department Performance</CardTitle>
+              <CardDescription>Academic performance across departments</CardDescription>
             </CardHeader>
             <CardContent>
               <div className="space-y-4">
-                {mockAcademicData.admissions.confirmedAdmissions.byProgram.map((program, index) => (
-                  <div key={index} className="flex items-center justify-between">
-                    <div className="flex-1">
-                      <div className="flex justify-between items-center mb-1">
-                        <span className="text-sm font-medium">{program.program}</span>
-                        <span className="text-sm text-gray-600">{program.percentage}%</span>
-                      </div>
-                      <Progress value={program.percentage} className="h-2" />
+                {mockAcademicData.academicRecords.departmentStrength.map((dept, index) => (
+                  <div key={index} className="flex items-center justify-between p-3 rounded-lg bg-muted/50">
+                    <div>
+                      <h4 className="font-medium">{dept.department}</h4>
+                      <p className="text-sm text-muted-foreground">
+                        {dept.strength} students • {dept.utilization}% capacity
+                      </p>
                     </div>
-                    <div className="ml-4 text-right">
-                      <div className="font-semibold">{formatNumber(program.count)}</div>
-                      <div className="text-xs text-gray-500">students</div>
+                    <div className="text-right">
+                      <div className="text-lg font-semibold">{dept.strength}</div>
+                      <div className="text-xs text-muted-foreground">/{dept.capacity}</div>
                     </div>
                   </div>
                 ))}
@@ -314,30 +314,287 @@ export function AcademicDashboard() {
           </Card>
         </TabsContent>
 
-        {/* Examinations Tab */}
-        <TabsContent value="examinations" className="space-y-6">
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-            {/* Upcoming Exams */}
+        <TabsContent value="students" className="space-y-4">
+          <div className="flex flex-col sm:flex-row gap-4 mb-6">
+            <div className="flex-1">
+              <div className="relative">
+                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                <Input
+                  placeholder="Search students..."
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  className="pl-10"
+                />
+              </div>
+            </div>
+            <Select value={selectedDepartment} onValueChange={setSelectedDepartment}>
+              <SelectTrigger className="w-48">
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">All Departments</SelectItem>
+                <SelectItem value="cs">Computer Science</SelectItem>
+                <SelectItem value="ece">Electronics</SelectItem>
+                <SelectItem value="mech">Mechanical</SelectItem>
+                <SelectItem value="civil">Civil</SelectItem>
+              </SelectContent>
+            </Select>
+            <Button>
+              <UserPlus className="h-4 w-4 mr-2" />
+              Add Student
+            </Button>
+          </div>
+
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <Users className="h-5 w-5" />
+                Student Management
+              </CardTitle>
+              <CardDescription>Manage student records and academic information</CardDescription>
+            </CardHeader>
+            <CardContent>
+              <Table>
+                <TableHeader>
+                  <TableRow>
+                    <TableHead>Student ID</TableHead>
+                    <TableHead>Name</TableHead>
+                    <TableHead>Department</TableHead>
+                    <TableHead>Year</TableHead>
+                    <TableHead>Status</TableHead>
+                    <TableHead>Actions</TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  <TableRow>
+                    <TableCell className="font-medium">CS2024001</TableCell>
+                    <TableCell>John Smith</TableCell>
+                    <TableCell>Computer Science</TableCell>
+                    <TableCell>2nd Year</TableCell>
+                    <TableCell>
+                      <Badge variant="outline" className="text-green-600 border-green-600">
+                        <CheckCircle className="h-3 w-3 mr-1" />
+                        Active
+                      </Badge>
+                    </TableCell>
+                    <TableCell>
+                      <div className="flex gap-2">
+                        <Button size="sm" variant="outline">
+                          <Eye className="h-3 w-3 mr-1" />
+                          View
+                        </Button>
+                        <Button size="sm" variant="outline">
+                          <Edit className="h-3 w-3 mr-1" />
+                          Edit
+                        </Button>
+                      </div>
+                    </TableCell>
+                  </TableRow>
+                  <TableRow>
+                    <TableCell className="font-medium">ECE2024002</TableCell>
+                    <TableCell>Sarah Johnson</TableCell>
+                    <TableCell>Electronics</TableCell>
+                    <TableCell>3rd Year</TableCell>
+                    <TableCell>
+                      <Badge variant="outline" className="text-yellow-600 border-yellow-600">
+                        <Clock className="h-3 w-3 mr-1" />
+                        Pending
+                      </Badge>
+                    </TableCell>
+                    <TableCell>
+                      <div className="flex gap-2">
+                        <Button size="sm" variant="outline">
+                          <Eye className="h-3 w-3 mr-1" />
+                          View
+                        </Button>
+                        <Button size="sm" variant="outline">
+                          <Edit className="h-3 w-3 mr-1" />
+                          Edit
+                        </Button>
+                      </div>
+                    </TableCell>
+                  </TableRow>
+                  <TableRow>
+                    <TableCell className="font-medium">ME2024003</TableCell>
+                    <TableCell>Mike Wilson</TableCell>
+                    <TableCell>Mechanical</TableCell>
+                    <TableCell>1st Year</TableCell>
+                    <TableCell>
+                      <Badge variant="outline" className="text-green-600 border-green-600">
+                        <CheckCircle className="h-3 w-3 mr-1" />
+                        Active
+                      </Badge>
+                    </TableCell>
+                    <TableCell>
+                      <div className="flex gap-2">
+                        <Button size="sm" variant="outline">
+                          <Eye className="h-3 w-3 mr-1" />
+                          View
+                        </Button>
+                        <Button size="sm" variant="outline">
+                          <Edit className="h-3 w-3 mr-1" />
+                          Edit
+                        </Button>
+                      </div>
+                    </TableCell>
+                  </TableRow>
+                </TableBody>
+              </Table>
+            </CardContent>
+          </Card>
+        </TabsContent>
+
+        <TabsContent value="courses" className="space-y-4">
+          <div className="flex justify-between items-center mb-6">
+            <div>
+              <h3 className="text-lg font-semibold">Course Management</h3>
+              <p className="text-muted-foreground">Manage courses, curriculum, and academic programs</p>
+            </div>
+            <Button>
+              <Plus className="h-4 w-4 mr-2" />
+              Add Course
+            </Button>
+          </div>
+
+          <div className="grid gap-4 md:grid-cols-2">
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <BookMarked className="h-5 w-5" />
+                  Active Courses
+                </CardTitle>
+                <CardDescription>Currently running courses this semester</CardDescription>
+              </CardHeader>
+              <CardContent>
+                <div className="space-y-3">
+                  <div className="flex items-center justify-between p-3 rounded-lg border">
+                    <div>
+                      <div className="font-medium">Data Structures & Algorithms</div>
+                      <div className="text-sm text-muted-foreground">CS301 • 234 students enrolled</div>
+                    </div>
+                    <div className="flex gap-2">
+                      <Button size="sm" variant="outline">
+                        <Eye className="h-3 w-3 mr-1" />
+                        View
+                      </Button>
+                      <Button size="sm" variant="outline">
+                        <Settings className="h-3 w-3 mr-1" />
+                        Manage
+                      </Button>
+                    </div>
+                  </div>
+                  <div className="flex items-center justify-between p-3 rounded-lg border">
+                    <div>
+                      <div className="font-medium">Database Management Systems</div>
+                      <div className="text-sm text-muted-foreground">CS401 • 189 students enrolled</div>
+                    </div>
+                    <div className="flex gap-2">
+                      <Button size="sm" variant="outline">
+                        <Eye className="h-3 w-3 mr-1" />
+                        View
+                      </Button>
+                      <Button size="sm" variant="outline">
+                        <Settings className="h-3 w-3 mr-1" />
+                        Manage
+                      </Button>
+                    </div>
+                  </div>
+                  <div className="flex items-center justify-between p-3 rounded-lg border">
+                    <div>
+                      <div className="font-medium">Computer Networks</div>
+                      <div className="text-sm text-muted-foreground">CS501 • 267 students enrolled</div>
+                    </div>
+                    <div className="flex gap-2">
+                      <Button size="sm" variant="outline">
+                        <Eye className="h-3 w-3 mr-1" />
+                        View
+                      </Button>
+                      <Button size="sm" variant="outline">
+                        <Settings className="h-3 w-3 mr-1" />
+                        Manage
+                      </Button>
+                    </div>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <Users2 className="h-5 w-5" />
+                  Faculty Assignment
+                </CardTitle>
+                <CardDescription>Course-faculty mapping and assignments</CardDescription>
+              </CardHeader>
+              <CardContent>
+                <div className="space-y-3">
+                  <div className="flex items-center justify-between p-3 rounded-lg bg-muted/50">
+                    <div>
+                      <div className="font-medium">Dr. Smith Johnson</div>
+                      <div className="text-sm text-muted-foreground">Data Structures & Algorithms</div>
+                    </div>
+                    <Badge variant="outline" className="text-green-600 border-green-600">
+                      Active
+                    </Badge>
+                  </div>
+                  <div className="flex items-center justify-between p-3 rounded-lg bg-muted/50">
+                    <div>
+                      <div className="font-medium">Prof. Sarah Davis</div>
+                      <div className="text-sm text-muted-foreground">Database Management Systems</div>
+                    </div>
+                    <Badge variant="outline" className="text-green-600 border-green-600">
+                      Active
+                    </Badge>
+                  </div>
+                  <div className="flex items-center justify-between p-3 rounded-lg bg-muted/50">
+                    <div>
+                      <div className="font-medium">Dr. Mike Wilson</div>
+                      <div className="text-sm text-muted-foreground">Computer Networks</div>
+                    </div>
+                    <Badge variant="outline" className="text-green-600 border-green-600">
+                      Active
+                    </Badge>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+          </div>
+        </TabsContent>
+
+        <TabsContent value="examinations" className="space-y-4">
+          <div className="flex justify-between items-center mb-6">
+            <div>
+              <h3 className="text-lg font-semibold">Examination Management</h3>
+              <p className="text-muted-foreground">Manage exams, schedules, and results</p>
+            </div>
+            <Button>
+              <CalendarDays className="h-4 w-4 mr-2" />
+              Schedule Exam
+            </Button>
+          </div>
+
+          <div className="grid gap-4 md:grid-cols-2">
             <Card>
               <CardHeader>
                 <CardTitle className="flex items-center gap-2">
                   <Calendar className="h-5 w-5" />
-                  Upcoming Exam Schedule
+                  Upcoming Examinations
                 </CardTitle>
                 <CardDescription>Next scheduled examinations</CardDescription>
               </CardHeader>
               <CardContent>
                 <div className="space-y-3">
                   {mockAcademicData.examinations.upcomingExams.map((exam, index) => (
-                    <div key={index} className="flex items-center justify-between p-3 border rounded-lg hover:bg-gray-50">
+                    <div key={index} className="flex items-center justify-between p-3 border rounded-lg hover:bg-muted/50">
                       <div>
                         <div className="font-medium">{exam.subject}</div>
-                        <div className="text-sm text-gray-600">{exam.date} • {exam.time}</div>
-                        <div className="text-xs text-gray-500">{exam.hall}</div>
+                        <div className="text-sm text-muted-foreground">{exam.date} • {exam.time}</div>
+                        <div className="text-xs text-muted-foreground">{exam.hall}</div>
                       </div>
                       <div className="text-right">
                         <div className="font-semibold text-blue-600">{exam.students}</div>
-                        <div className="text-xs text-gray-500">students</div>
+                        <div className="text-xs text-muted-foreground">students</div>
                       </div>
                     </div>
                   ))}
@@ -345,14 +602,13 @@ export function AcademicDashboard() {
               </CardContent>
             </Card>
 
-            {/* Exam Statistics */}
             <Card>
               <CardHeader>
                 <CardTitle className="flex items-center gap-2">
                   <ClipboardList className="h-5 w-5" />
                   Examination Statistics
                 </CardTitle>
-                <CardDescription>Registration and hall ticket status</CardDescription>
+                <CardDescription>Registration and results status</CardDescription>
               </CardHeader>
               <CardContent>
                 <div className="space-y-4">
@@ -385,7 +641,6 @@ export function AcademicDashboard() {
             </Card>
           </div>
 
-          {/* Grade Distribution */}
           <Card>
             <CardHeader>
               <CardTitle>Grade Distribution Summary</CardTitle>
@@ -428,111 +683,8 @@ export function AcademicDashboard() {
           </Card>
         </TabsContent>
 
-        {/* Academic Records Tab */}
-        <TabsContent value="academic-records" className="space-y-6">
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-            {/* Student Profiles Status */}
-            <Card>
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <Users className="h-5 w-5" />
-                  Student Profiles Status
-                </CardTitle>
-                <CardDescription>Profile completion and data quality</CardDescription>
-              </CardHeader>
-              <CardContent>
-                <div className="space-y-4">
-                  <div className="bg-green-50 p-4 rounded-lg border border-green-200">
-                    <div className="text-sm text-green-600 font-medium">Total Active Students</div>
-                    <div className="text-2xl font-bold text-green-700">{formatNumber(mockAcademicData.academicRecords.totalActiveStudents)}</div>
-                    <div className="text-xs text-green-500">Across all programs</div>
-                  </div>
-                  <div className="grid grid-cols-2 gap-4">
-                    <div className="bg-orange-50 p-4 rounded-lg border border-orange-200">
-                      <div className="text-sm text-orange-600 font-medium">Incomplete</div>
-                      <div className="text-2xl font-bold text-orange-700">{mockAcademicData.academicRecords.incompleteProfiles}</div>
-                      <div className="text-xs text-orange-500">Profiles</div>
-                    </div>
-                    <div className="bg-red-50 p-4 rounded-lg border border-red-200">
-                      <div className="text-sm text-red-600 font-medium">Outdated</div>
-                      <div className="text-2xl font-bold text-red-700">{mockAcademicData.academicRecords.outdatedProfiles}</div>
-                      <div className="text-xs text-red-500">Profiles</div>
-                    </div>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-
-            {/* Department Strength */}
-            <Card>
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <Target className="h-5 w-5" />
-                  Department-wise Strength
-                </CardTitle>
-                <CardDescription>Current strength vs capacity</CardDescription>
-              </CardHeader>
-              <CardContent>
-                <div className="space-y-4">
-                  {mockAcademicData.academicRecords.departmentStrength.map((dept, index) => (
-                    <div key={index} className="space-y-2">
-                      <div className="flex justify-between items-center">
-                        <span className="text-sm font-medium">{dept.department}</span>
-                        <span className="text-sm text-gray-600">{dept.utilization}%</span>
-                      </div>
-                      <div className="flex items-center gap-3">
-                        <Progress value={dept.utilization} className="flex-1 h-2" />
-                        <span className="text-sm font-semibold min-w-0">
-                          {dept.strength}/{dept.capacity}
-                        </span>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              </CardContent>
-            </Card>
-          </div>
-
-          {/* Course-wise Student Distribution */}
-          <Card>
-            <CardHeader>
-              <CardTitle>Students by Course and Year</CardTitle>
-              <CardDescription>Year-wise distribution across different courses</CardDescription>
-            </CardHeader>
-            <CardContent>
-              <Table>
-                <TableHeader>
-                  <TableRow>
-                    <TableHead>Course</TableHead>
-                    <TableHead className="text-center">Year 1</TableHead>
-                    <TableHead className="text-center">Year 2</TableHead>
-                    <TableHead className="text-center">Year 3</TableHead>
-                    <TableHead className="text-center">Year 4</TableHead>
-                    <TableHead className="text-center">Total</TableHead>
-                  </TableRow>
-                </TableHeader>
-                <TableBody>
-                  {mockAcademicData.academicRecords.byCourse.map((course, index) => (
-                    <TableRow key={index}>
-                      <TableCell className="font-medium">{course.course}</TableCell>
-                      <TableCell className="text-center">{course.year1}</TableCell>
-                      <TableCell className="text-center">{course.year2}</TableCell>
-                      <TableCell className="text-center">{course.year3 || '-'}</TableCell>
-                      <TableCell className="text-center">{course.year4 || '-'}</TableCell>
-                      <TableCell className="text-center font-semibold">
-                        {course.year1 + course.year2 + course.year3 + course.year4}
-                      </TableCell>
-                    </TableRow>
-                  ))}
-                </TableBody>
-              </Table>
-            </CardContent>
-          </Card>
-        </TabsContent>
-
-        {/* Analytics Tab */}
-        <TabsContent value="analytics" className="space-y-6">
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+        <TabsContent value="analytics" className="space-y-4">
+          <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
             <Card className="bg-gradient-to-br from-indigo-50 to-indigo-100 border-indigo-200">
               <CardHeader className="pb-2">
                 <CardTitle className="text-sm font-medium text-indigo-800">Admission Rate</CardTitle>
@@ -586,8 +738,7 @@ export function AcademicDashboard() {
             </Card>
           </div>
 
-          {/* Additional Analytics */}
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          <div className="grid gap-4 md:grid-cols-2">
             <Card>
               <CardHeader>
                 <CardTitle>Academic Performance Trends</CardTitle>
@@ -622,42 +773,122 @@ export function AcademicDashboard() {
 
             <Card>
               <CardHeader>
-                <CardTitle>Alerts & Notifications</CardTitle>
-                <CardDescription>Important academic alerts</CardDescription>
+                <CardTitle>Department Performance</CardTitle>
+                <CardDescription>Academic metrics by department</CardDescription>
               </CardHeader>
               <CardContent>
-                <div className="space-y-3">
-                  <div className="p-3 rounded-lg border border-yellow-200 bg-yellow-50">
-                    <div className="flex items-start gap-2">
-                      <AlertTriangle className="h-4 w-4 text-yellow-600 mt-0.5" />
-                      <div>
-                        <div className="text-sm font-medium text-yellow-800">Exam Schedule Conflict</div>
-                        <div className="text-xs text-yellow-600">2 exams scheduled at same time slot</div>
+                <div className="space-y-4">
+                  {mockAcademicData.academicRecords.departmentStrength.map((dept, index) => (
+                    <div key={index} className="space-y-2">
+                      <div className="flex justify-between items-center">
+                        <span className="text-sm font-medium">{dept.department}</span>
+                        <span className="text-sm text-muted-foreground">{dept.utilization}%</span>
+                      </div>
+                      <div className="flex items-center gap-3">
+                        <Progress value={dept.utilization} className="flex-1 h-2" />
+                        <span className="text-sm font-semibold min-w-0">
+                          {dept.strength}/{dept.capacity}
+                        </span>
                       </div>
                     </div>
-                  </div>
-                  <div className="p-3 rounded-lg border border-red-200 bg-red-50">
-                    <div className="flex items-start gap-2">
-                      <AlertTriangle className="h-4 w-4 text-red-600 mt-0.5" />
-                      <div>
-                        <div className="text-sm font-medium text-red-800">Missing Documents</div>
-                        <div className="text-xs text-red-600">89 students have incomplete documentation</div>
-                      </div>
-                    </div>
-                  </div>
-                  <div className="p-3 rounded-lg border border-blue-200 bg-blue-50">
-                    <div className="flex items-start gap-2">
-                      <Bell className="h-4 w-4 text-blue-600 mt-0.5" />
-                      <div>
-                        <div className="text-sm font-medium text-blue-800">Registration Deadline</div>
-                        <div className="text-xs text-blue-600">Next semester registration ends in 5 days</div>
-                      </div>
-                    </div>
-                  </div>
+                  ))}
                 </div>
               </CardContent>
             </Card>
           </div>
+        </TabsContent>
+
+        <TabsContent value="notifications" className="space-y-4">
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <Bell className="h-5 w-5" />
+                Academic Notifications
+              </CardTitle>
+              <CardDescription>Important academic alerts and updates</CardDescription>
+            </CardHeader>
+            <CardContent>
+              <div className="space-y-4">
+                <div className="flex items-start gap-3 p-4 rounded-lg border border-yellow-200 bg-yellow-50">
+                  <div className="flex-shrink-0 mt-1">
+                    <AlertTriangle className="h-5 w-5 text-yellow-500" />
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <h4 className="font-medium text-yellow-800">Exam Schedule Conflict</h4>
+                    <p className="text-sm text-yellow-600 mt-1">2 exams scheduled at same time slot for Computer Science department</p>
+                    <p className="text-xs text-yellow-600 mt-2">2 hours ago</p>
+                  </div>
+                  <Button variant="ghost" size="sm">
+                    <Eye className="h-4 w-4 mr-1" />
+                    View
+                  </Button>
+                </div>
+
+                <div className="flex items-start gap-3 p-4 rounded-lg border border-red-200 bg-red-50">
+                  <div className="flex-shrink-0 mt-1">
+                    <XCircle className="h-5 w-5 text-red-500" />
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <h4 className="font-medium text-red-800">Missing Documents</h4>
+                    <p className="text-sm text-red-600 mt-1">89 students have incomplete documentation for admission verification</p>
+                    <p className="text-xs text-red-600 mt-2">4 hours ago</p>
+                  </div>
+                  <Button variant="ghost" size="sm">
+                    <Eye className="h-4 w-4 mr-1" />
+                    View
+                  </Button>
+                </div>
+
+                <div className="flex items-start gap-3 p-4 rounded-lg border border-blue-200 bg-blue-50">
+                  <div className="flex-shrink-0 mt-1">
+                    <Bell className="h-5 w-5 text-blue-500" />
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <h4 className="font-medium text-blue-800">Registration Deadline</h4>
+                    <p className="text-sm text-blue-600 mt-1">Next semester registration ends in 5 days</p>
+                    <p className="text-xs text-blue-600 mt-2">1 day ago</p>
+                  </div>
+                  <Button variant="ghost" size="sm">
+                    <Eye className="h-4 w-4 mr-1" />
+                    View
+                  </Button>
+                </div>
+
+                <div className="flex items-start gap-3 p-4 rounded-lg border border-green-200 bg-green-50">
+                  <div className="flex-shrink-0 mt-1">
+                    <CheckCircle className="h-5 w-5 text-green-500" />
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <h4 className="font-medium text-green-800">Results Published</h4>
+                    <p className="text-sm text-green-600 mt-1">Semester 6 results have been published for all departments</p>
+                    <p className="text-xs text-green-600 mt-2">2 days ago</p>
+                  </div>
+                  <Button variant="ghost" size="sm">
+                    <Eye className="h-4 w-4 mr-1" />
+                    View
+                  </Button>
+                </div>
+
+                <div className="flex items-start gap-3 p-4 rounded-lg border border-purple-200 bg-purple-50">
+                  <div className="flex-shrink-0 mt-1">
+                    <Star className="h-5 w-5 text-purple-500" />
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <h4 className="font-medium text-purple-800">Achievement Recognition</h4>
+                    <p className="text-sm text-purple-600 mt-1">Computer Science department achieved 98% placement rate this semester</p>
+                    <p className="text-xs text-purple-600 mt-2">3 days ago</p>
+                  </div>
+                  <Button variant="ghost" size="sm">
+                    <Eye className="h-4 w-4 mr-1" />
+                    View
+                  </Button>
+                </div>
+              </div>
+              <Button variant="outline" className="w-full mt-4">
+                View All Notifications
+              </Button>
+            </CardContent>
+          </Card>
         </TabsContent>
       </Tabs>
     </div>
