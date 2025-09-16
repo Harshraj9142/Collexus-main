@@ -6,8 +6,7 @@ import { useState, useEffect } from "react"
 import { useRouter } from "next/navigation"
 import { useSession } from "next-auth/react"
 import { Navbar } from "./navbar"
-import { Sidebar } from "./sidebar"
-import { cn } from "@/lib/utils"
+ import { cn } from "@/lib/utils"
 
 interface DashboardLayoutProps {
   children: React.ReactNode
@@ -39,24 +38,13 @@ export function DashboardLayout({ children }: DashboardLayoutProps) {
 
   return (
     <div className="flex h-screen bg-background">
-      {/* Desktop Sidebar */}
-      <div className="hidden md:flex">
-        <Sidebar isOpen={sidebarOpen} />
-      </div>
+     
 
-      {/* Mobile Sidebar Overlay */}
-      {mobileMenuOpen && (
-        <div className="fixed inset-0 z-50 md:hidden">
-          <div className="fixed inset-0 bg-background/80 backdrop-blur-sm" onClick={() => setMobileMenuOpen(false)} />
-          <div className="fixed left-0 top-0 h-full">
-            <Sidebar isOpen={true} onClose={() => setMobileMenuOpen(false)} />
-          </div>
-        </div>
-      )}
+      
 
       {/* Main Content */}
       <div className="flex flex-1 flex-col overflow-hidden">
-        <Navbar onMenuClick={() => setMobileMenuOpen(!mobileMenuOpen)} />
+        <Navbar onMenuClickAction={() => setMobileMenuOpen(!mobileMenuOpen)} />
 
         <main className="flex-1 overflow-y-auto p-6">
           <div className="mx-auto max-w-7xl">{children}</div>
