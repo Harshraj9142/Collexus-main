@@ -3,6 +3,7 @@ import bcrypt from 'bcryptjs'
 import { randomUUID } from 'crypto'
 
 export type UserRole = "student" | "faculty" | "admin" | "parent"
+export type AdminSubRole = "financial" | "academic" | "hostel"
 
 export interface User {
   _id?: string
@@ -11,6 +12,7 @@ export interface User {
   email: string
   password: string
   role: UserRole
+  adminSubRole?: AdminSubRole
   avatar?: string
   emailVerified?: Date
   createdAt: Date
@@ -22,6 +24,7 @@ export interface UserInput {
   email: string
   password: string
   role: UserRole
+  adminSubRole?: AdminSubRole
   avatar?: string
 }
 
@@ -41,6 +44,7 @@ export class UserModel {
       email: userData.email,
       password: hashedPassword,
       role: userData.role,
+      adminSubRole: userData.adminSubRole,
       avatar: userData.avatar,
       createdAt: new Date(),
       updatedAt: new Date(),
@@ -64,6 +68,7 @@ export class UserModel {
       email: user.email,
       password: user.password,
       role: user.role,
+      adminSubRole: user.adminSubRole,
       avatar: user.avatar,
       emailVerified: user.emailVerified,
       createdAt: user.createdAt,
@@ -81,6 +86,7 @@ export class UserModel {
       email: user.email,
       password: user.password,
       role: user.role,
+      adminSubRole: user.adminSubRole,
       avatar: user.avatar,
       emailVerified: user.emailVerified,
       createdAt: user.createdAt,

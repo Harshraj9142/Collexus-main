@@ -1,11 +1,12 @@
 import { DefaultSession } from "next-auth"
-import { UserRole } from "@/lib/types"
+import { UserRole, AdminSubRole } from "@/lib/types"
 
 declare module "next-auth" {
   interface Session {
     user: {
       id: string
       role: UserRole
+      adminSubRole?: AdminSubRole
       avatar?: string
     } & DefaultSession["user"]
   }
@@ -13,6 +14,7 @@ declare module "next-auth" {
   interface User {
     id: string
     role: UserRole
+    adminSubRole?: AdminSubRole
     avatar?: string
   }
 }
@@ -20,6 +22,7 @@ declare module "next-auth" {
 declare module "next-auth/jwt" {
   interface JWT {
     role: UserRole
+    adminSubRole?: AdminSubRole
     avatar?: string
   }
 }

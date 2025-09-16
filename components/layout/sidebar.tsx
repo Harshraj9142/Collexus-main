@@ -180,7 +180,7 @@ export function Sidebar({ className, isOpen = true, onClose }: SidebarProps) {
     if (href === "/dashboard") {
       return pathname === `/dashboard/${user.role}`
     }
-    return pathname.startsWith(href)
+    return pathname?.startsWith(href) || false
   }
 
   return (

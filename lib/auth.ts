@@ -16,6 +16,7 @@ export async function getCurrentUser(): Promise<User | null> {
     name: session.user.name || '',
     email: session.user.email || '',
     role: session.user.role,
+    adminSubRole: session.user.adminSubRole,
     avatar: session.user.avatar,
   }
 }

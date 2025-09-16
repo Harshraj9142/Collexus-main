@@ -9,13 +9,14 @@ import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import type { UserRole } from "@/lib/types"
+import type { UserRole, AdminSubRole } from "@/lib/types"
 import { Loader2, GraduationCap, Eye, EyeOff } from "lucide-react"
 
 export function LoginForm() {
   const [email, setEmail] = useState("")
   const [password, setPassword] = useState("")
   const [selectedRole, setSelectedRole] = useState<UserRole>("student")
+  const [selectedAdminSubRole, setSelectedAdminSubRole] = useState<AdminSubRole | "">("")
   const [isLoading, setIsLoading] = useState(false)
   const [error, setError] = useState("")
   const [showPassword, setShowPassword] = useState(false)
@@ -30,8 +31,23 @@ export function LoginForm() {
     }
   }, [searchParams])
 
+  const handleRoleChange = (role: UserRole) => {
+    setSelectedRole(role)
+    // Reset admin sub-role when role changes from admin to something else
+    if (role !== 'admin') {
+      setSelectedAdminSubRole("")
+    }
+  }
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
+    
+    // Validate admin sub-role if admin is selected
+    if (selectedRole === 'admin' && !selectedAdminSubRole) {
+      setError("Please select an admin type")
+      return
+    }
+    
     setIsLoading(true)
     setError("")
     setSuccessMessage("")
@@ -41,6 +57,7 @@ export function LoginForm() {
         email,
         password,
         role: selectedRole,
+        adminSubRole: selectedRole === 'admin' ? selectedAdminSubRole : undefined,
         redirect: false,
       })
 
@@ -77,7 +94,7 @@ export function LoginForm() {
           <form onSubmit={handleSubmit} className="space-y-4">
             <div className="space-y-2">
               <Label htmlFor="role">Select Role</Label>
-              <Select value={selectedRole} onValueChange={(value: UserRole) => setSelectedRole(value)}>
+              <Select value={selectedRole} onValueChange={handleRoleChange}>
                 <SelectTrigger>
                   <SelectValue placeholder="Select your role" />
                 </SelectTrigger>
@@ -89,6 +106,25 @@ export function LoginForm() {
                 </SelectContent>
               </Select>
             </div>
+
+            {selectedRole === 'admin' && (
+              <div className="space-y-2">
+                <Label htmlFor="adminSubRole">Admin Type</Label>
+                <Select 
+                  value={selectedAdminSubRole} 
+                  onValueChange={(value: AdminSubRole) => setSelectedAdminSubRole(value)}
+                >
+                  <SelectTrigger>
+                    <SelectValue placeholder="Select admin type" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="financial">Financial</SelectItem>
+                    <SelectItem value="academic">Academic</SelectItem>
+                    <SelectItem value="hostel">Hostel</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+            )}
 
             <div className="space-y-2">
               <Label htmlFor="email">Email</Label>

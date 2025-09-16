@@ -1,6 +1,7 @@
 "use client"
 
 import { useState } from "react"
+import { useSession } from "next-auth/react"
 import { useStudentCount } from "@/hooks/use-student-count"
 import { StudentCountTest } from "@/components/admin/student-count-test"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
@@ -37,7 +38,9 @@ import {
   LineChart,
   Line,
 } from "recharts"
-import { getCurrentUserClient as getCurrentUser } from "@/lib/auth-client"
+import { FinancialDashboard } from "./financial-dashboard"
+import { AcademicDashboard } from "./academic-dashboard"
+import { HostelDashboard } from "./hostel-dashboard"
 
 // Mock data for admin dashboard
 const mockAdminData = {
@@ -127,9 +130,27 @@ const mockAdminData = {
 }
 
 export function AdminDashboard() {
-  const user = getCurrentUser()
+  const { data: session, status } = useSession()
   const [selectedDepartment, setSelectedDepartment] = useState("all")
   const { studentCount, isLoading: isLoadingCount, error: countError, isConnected } = useStudentCount()
+
+  // Show loading state while session is loading
+  if (status === "loading") {
+    return <div className="flex items-center justify-center min-h-screen">Loading...</div>
+  }
+
+  // Show specific dashboard based on admin sub-role
+  if (session?.user?.adminSubRole === 'financial') {
+    return <FinancialDashboard />
+  }
+  
+  if (session?.user?.adminSubRole === 'academic') {
+    return <AcademicDashboard />
+  }
+  
+  if (session?.user?.adminSubRole === 'hostel') {
+    return <HostelDashboard />
+  }
 
   const handleApproval = (id: string, action: "approve" | "reject") => {
     console.log(`${action} application ${id}`)
@@ -144,7 +165,7 @@ export function AdminDashboard() {
       <div className="flex flex-col gap-2">
         <h1 className="text-3xl font-bold text-balance">Admin Dashboard</h1>
         <p className="text-muted-foreground text-pretty">
-          Welcome, {user?.name}! Monitor college operations and manage administrative tasks.
+          Welcome, {session?.user?.name}! Monitor college operations and manage administrative tasks.
         </p>
       </div>
 

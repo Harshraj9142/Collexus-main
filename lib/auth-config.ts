@@ -1,6 +1,6 @@
 import { NextAuthOptions } from 'next-auth'
 import CredentialsProvider from 'next-auth/providers/credentials'
-import { UserRole } from './models/User'
+import { UserRole, AdminSubRole } from './models/User'
 import bcrypt from 'bcryptjs'
 
 // Demo users for development when MongoDB is not available
@@ -23,10 +23,29 @@ const demoUsers = [
   },
   {
     id: '3',
-    name: 'Admin User',
+    name: 'Financial Admin',
     email: 'admin@demo.com',
     password: '$2a$12$LQv3c1yqBWVHxkd0LHAkCOYz6TtxMQJqhN8/LewdBPj4J/8K5K5K2', // password: admin123
     role: 'admin' as UserRole,
+    adminSubRole: 'financial' as AdminSubRole,
+    avatar: '/admin-avatar.png'
+  },
+  {
+    id: '5',
+    name: 'Academic Admin',
+    email: 'academic@demo.com',
+    password: '$2a$12$LQv3c1yqBWVHxkd0LHAkCOYz6TtxMQJqhN8/LewdBPj4J/8K5K5K2', // password: admin123
+    role: 'admin' as UserRole,
+    adminSubRole: 'academic' as AdminSubRole,
+    avatar: '/admin-avatar.png'
+  },
+  {
+    id: '6',
+    name: 'Hostel Admin',
+    email: 'hostel@demo.com',
+    password: '$2a$12$LQv3c1yqBWVHxkd0LHAkCOYz6TtxMQJqhN8/LewdBPj4J/8K5K5K2', // password: admin123
+    role: 'admin' as UserRole,
+    adminSubRole: 'hostel' as AdminSubRole,
     avatar: '/admin-avatar.png'
   },
   {
@@ -46,7 +65,8 @@ export const authOptions: NextAuthOptions = {
       credentials: {
         email: { label: 'Email', type: 'email' },
         password: { label: 'Password', type: 'password' },
-        role: { label: 'Role', type: 'text' }
+        role: { label: 'Role', type: 'text' },
+        adminSubRole: { label: 'Admin Sub Role', type: 'text' }
       },
       async authorize(credentials) {
         if (!credentials?.email || !credentials?.password || !credentials?.role) {
@@ -79,18 +99,35 @@ export const authOptions: NextAuthOptions = {
               return null
             }
 
+            // For admin users, also check admin sub-role
+            if (user.role === 'admin' && credentials.adminSubRole) {
+              if (user.adminSubRole !== credentials.adminSubRole) {
+                return null
+              }
+            }
+
             return {
               id: user.id,
               name: user.name,
               email: user.email,
               role: user.role,
+              adminSubRole: user.adminSubRole,
               avatar: user.avatar,
             }
           } catch (mongoError) {
             console.log('MongoDB not available, using demo users:', mongoError instanceof Error ? mongoError.message : 'Unknown error')
             
             // Fallback to demo users
-            const user = demoUsers.find(u => u.email === credentials.email && u.role === credentials.role)
+            let user = demoUsers.find(u => u.email === credentials.email && u.role === credentials.role)
+            
+            // For admin users, also match admin sub-role
+            if (credentials.role === 'admin' && credentials.adminSubRole) {
+              user = demoUsers.find(u => 
+                u.email === credentials.email && 
+                u.role === credentials.role && 
+                u.adminSubRole === credentials.adminSubRole
+              )
+            }
             
             if (!user) {
               return null
@@ -108,6 +145,7 @@ export const authOptions: NextAuthOptions = {
               name: user.name,
               email: user.email,
               role: user.role,
+              adminSubRole: user.adminSubRole,
               avatar: user.avatar,
             }
           }
@@ -125,6 +163,7 @@ export const authOptions: NextAuthOptions = {
     async jwt({ token, user }) {
       if (user) {
         token.role = user.role
+        token.adminSubRole = user.adminSubRole
         token.avatar = user.avatar
       }
       return token
@@ -133,6 +172,7 @@ export const authOptions: NextAuthOptions = {
       if (token) {
         session.user.id = token.sub!
         session.user.role = token.role as UserRole
+        session.user.adminSubRole = token.adminSubRole as AdminSubRole
         session.user.avatar = token.avatar as string
       }
       return session

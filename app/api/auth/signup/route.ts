@@ -1,10 +1,10 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { UserInput, UserRole } from '@/lib/models/User'
+import { UserInput, UserRole, AdminSubRole } from '@/lib/models/User'
 
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json()
-    const { name, email, password, role } = body
+    const { name, email, password, role, adminSubRole } = body
 
     // Validate required fields
     if (!name || !email || !password || !role) {
@@ -21,6 +21,17 @@ export async function POST(request: NextRequest) {
         { error: 'Invalid role' },
         { status: 400 }
       )
+    }
+
+    // Validate admin sub-role if role is admin
+    if (role === 'admin') {
+      const validAdminSubRoles: AdminSubRole[] = ['financial', 'academic', 'hostel']
+      if (!adminSubRole || !validAdminSubRoles.includes(adminSubRole)) {
+        return NextResponse.json(
+          { error: 'Valid admin sub-role is required for admin users' },
+          { status: 400 }
+        )
+      }
     }
 
     // Validate email format
@@ -64,6 +75,7 @@ export async function POST(request: NextRequest) {
         email,
         password,
         role,
+        adminSubRole: role === 'admin' ? adminSubRole : undefined,
       }
 
       const newUser = await userModel.createUser(userData)
@@ -101,6 +113,7 @@ export async function POST(request: NextRequest) {
             name,
             email,
             role,
+            adminSubRole: role === 'admin' ? adminSubRole : undefined,
             avatar: null
           }
         },

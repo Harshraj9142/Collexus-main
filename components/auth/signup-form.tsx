@@ -8,7 +8,7 @@ import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import type { UserRole } from "@/lib/types"
+import type { UserRole, AdminSubRole } from "@/lib/types"
 import { Loader2, GraduationCap, Eye, EyeOff } from "lucide-react"
 
 export function SignupForm() {
@@ -18,6 +18,7 @@ export function SignupForm() {
     password: "",
     confirmPassword: "",
     role: "student" as UserRole,
+    adminSubRole: "" as AdminSubRole | "",
   })
   const [isLoading, setIsLoading] = useState(false)
   const [error, setError] = useState("")
@@ -26,10 +27,17 @@ export function SignupForm() {
   const router = useRouter()
 
   const handleInputChange = (field: string, value: string) => {
-    setFormData(prev => ({
-      ...prev,
-      [field]: value
-    }))
+    setFormData(prev => {
+      const updated = {
+        ...prev,
+        [field]: value
+      }
+      // Reset admin sub-role when role changes from admin to something else
+      if (field === 'role' && value !== 'admin') {
+        updated.adminSubRole = ""
+      }
+      return updated
+    })
     setError("") // Clear error when user starts typing
   }
 
@@ -52,6 +60,10 @@ export function SignupForm() {
     }
     if (formData.password !== formData.confirmPassword) {
       setError("Passwords do not match")
+      return false
+    }
+    if (formData.role === 'admin' && !formData.adminSubRole) {
+      setError("Admin sub-role is required for admin users")
       return false
     }
     return true
@@ -78,6 +90,7 @@ export function SignupForm() {
           email: formData.email,
           password: formData.password,
           role: formData.role,
+          adminSubRole: formData.role === 'admin' ? formData.adminSubRole : undefined,
         }),
       })
 
@@ -151,6 +164,25 @@ export function SignupForm() {
                 </SelectContent>
               </Select>
             </div>
+
+            {formData.role === 'admin' && (
+              <div className="space-y-2">
+                <Label htmlFor="adminSubRole">Admin Type</Label>
+                <Select 
+                  value={formData.adminSubRole} 
+                  onValueChange={(value: AdminSubRole) => handleInputChange("adminSubRole", value)}
+                >
+                  <SelectTrigger>
+                    <SelectValue placeholder="Select admin type" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="financial">Financial</SelectItem>
+                    <SelectItem value="academic">Academic</SelectItem>
+                    <SelectItem value="hostel">Hostel</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+            )}
 
             <div className="space-y-2">
               <Label htmlFor="password">Password</Label>
