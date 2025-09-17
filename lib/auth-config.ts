@@ -1,6 +1,6 @@
 import { NextAuthOptions } from 'next-auth'
 import CredentialsProvider from 'next-auth/providers/credentials'
-import { UserRole, AdminSubRole } from './models/User'
+import { UserRole, AdminSubRole, FacultySubRole } from './models/User'
 import bcrypt from 'bcryptjs'
 
 // Demo users for development when MongoDB is not available
@@ -58,6 +58,15 @@ const demoUsers = [
     avatar: '/admin-avatar.png'
   },
   {
+    id: '8',
+    name: 'Dr. John HOD',
+    email: 'hod@demo.com',
+    password: '$2a$12$LQv3c1yqBWVHxkd0LHAkCOYz6TtxMQJqhN8/LewdBPj4J/8K5K5K2', // password: hod123
+    role: 'faculty' as UserRole,
+    FacultySubRole: 'hod' as FacultySubRole,
+    avatar: '/hod-avatar.png'
+  },
+  {
     id: '4',
     name: 'Parent User',
     email: 'parent@demo.com',
@@ -75,7 +84,8 @@ export const authOptions: NextAuthOptions = {
         email: { label: 'Email', type: 'email' },
         password: { label: 'Password', type: 'password' },
         role: { label: 'Role', type: 'text' },
-        adminSubRole: { label: 'Admin Sub Role', type: 'text' }
+        adminSubRole: { label: 'Admin Sub Role', type: 'text' },
+        FacultySubRole: { label: 'Faculty Sub Role', type: 'text' }
       },
       async authorize(credentials) {
         if (!credentials?.email || !credentials?.password || !credentials?.role) {
@@ -115,12 +125,20 @@ export const authOptions: NextAuthOptions = {
               }
             }
 
+            // For faculty users, also check faculty sub-role
+            if (user.role === 'faculty' && credentials.FacultySubRole) {
+              if (user.FacultySubRole !== credentials.FacultySubRole) {
+                return null
+              }
+            }
+
             return {
               id: user.id,
               name: user.name,
               email: user.email,
               role: user.role,
               adminSubRole: user.adminSubRole,
+              FacultySubRole: user.FacultySubRole,
               avatar: user.avatar,
             }
           } catch (mongoError) {
@@ -135,6 +153,15 @@ export const authOptions: NextAuthOptions = {
                 u.email === credentials.email && 
                 u.role === credentials.role && 
                 u.adminSubRole === credentials.adminSubRole
+              )
+            }
+
+            // For faculty users, also match faculty sub-role
+            if (credentials.role === 'faculty' && credentials.FacultySubRole) {
+              user = demoUsers.find(u => 
+                u.email === credentials.email && 
+                u.role === credentials.role && 
+                u.FacultySubRole === credentials.FacultySubRole
               )
             }
             
@@ -155,6 +182,7 @@ export const authOptions: NextAuthOptions = {
               email: user.email,
               role: user.role,
               adminSubRole: user.adminSubRole,
+              FacultySubRole: user.FacultySubRole,
               avatar: user.avatar,
             }
           }
@@ -173,6 +201,7 @@ export const authOptions: NextAuthOptions = {
       if (user) {
         token.role = user.role
         token.adminSubRole = user.adminSubRole
+        token.FacultySubRole = user.FacultySubRole
         token.avatar = user.avatar
       }
       return token
@@ -182,6 +211,7 @@ export const authOptions: NextAuthOptions = {
         session.user.id = token.sub!
         session.user.role = token.role as UserRole
         session.user.adminSubRole = token.adminSubRole as AdminSubRole
+        session.user.FacultySubRole = token.FacultySubRole as FacultySubRole
         session.user.avatar = token.avatar as string
       }
       return session

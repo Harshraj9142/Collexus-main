@@ -8,7 +8,7 @@ import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import type { UserRole, AdminSubRole } from "@/lib/types"
+import type { UserRole, AdminSubRole, FacultySubRole } from "@/lib/types"
 import { Loader2, GraduationCap, Eye, EyeOff } from "lucide-react"
 
 export function SignupForm() {
@@ -19,6 +19,7 @@ export function SignupForm() {
     confirmPassword: "",
     role: "student" as UserRole,
     adminSubRole: "" as AdminSubRole | "",
+    FacultySubRole: "" as FacultySubRole | "",
   })
   const [isLoading, setIsLoading] = useState(false)
   const [error, setError] = useState("")
@@ -35,6 +36,10 @@ export function SignupForm() {
       // Reset admin sub-role when role changes from admin to something else
       if (field === 'role' && value !== 'admin') {
         updated.adminSubRole = ""
+      }
+      // Reset faculty sub-role when role changes from faculty to something else
+      if (field === 'role' && value !== 'faculty') {
+        updated.FacultySubRole = ""
       }
       return updated
     })
@@ -66,6 +71,10 @@ export function SignupForm() {
       setError("Admin sub-role is required for admin users")
       return false
     }
+    if (formData.role === 'faculty' && !formData.FacultySubRole) {
+      setError("Faculty sub-role is required for faculty users")
+      return false
+    }
     return true
   }
 
@@ -80,18 +89,23 @@ export function SignupForm() {
     setError("")
 
     try {
+      const requestBody = {
+        name: formData.name,
+        email: formData.email,
+        password: formData.password,
+        role: formData.role,
+        adminSubRole: formData.role === 'admin' ? formData.adminSubRole : undefined,
+        FacultySubRole: formData.role === 'faculty' ? formData.FacultySubRole : undefined,
+      }
+      
+      console.log('Frontend sending:', requestBody)
+      
       const response = await fetch('/api/auth/signup', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({
-          name: formData.name,
-          email: formData.email,
-          password: formData.password,
-          role: formData.role,
-          adminSubRole: formData.role === 'admin' ? formData.adminSubRole : undefined,
-        }),
+        body: JSON.stringify(requestBody),
       })
 
       const data = await response.json()
@@ -100,6 +114,7 @@ export function SignupForm() {
         // Redirect to signin page with success message
         router.push('/auth/signin?message=Account created successfully. Please sign in.')
       } else {
+        console.log('Signup error response:', data)
         setError(data.error || 'Signup failed. Please try again.')
       }
     } catch {
@@ -180,6 +195,25 @@ export function SignupForm() {
                     <SelectItem value="academic">Academic</SelectItem>
                     <SelectItem value="hostel">Hostel</SelectItem>
                     <SelectItem value="library">Library</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+            )}
+
+            {formData.role === 'faculty' && (
+              <div className="space-y-2">
+                <Label htmlFor="FacultySubRole">Faculty Type</Label>
+                <Select 
+                  value={formData.FacultySubRole} 
+                  onValueChange={(value: FacultySubRole) => handleInputChange("FacultySubRole", value)}
+                >
+                  <SelectTrigger>
+                    <SelectValue placeholder="Select faculty type" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="hod">HOD</SelectItem>
+                    <SelectItem value="assistant_hod">Assistant HOD</SelectItem>
+                    <SelectItem value="professor">Professor</SelectItem>
                   </SelectContent>
                 </Select>
               </div>

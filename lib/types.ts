@@ -1,6 +1,6 @@
 export type UserRole = "student" | "faculty" | "admin" | "parent"
 export type AdminSubRole = "financial" | "academic" | "hostel" | "library"
-export type FacultySubRole = "HOD" | "Assistant HOD" | "Professor"
+export type FacultySubRole = "hod" | "assistant_hod" | "professor"
 
 export interface User {
   id: string

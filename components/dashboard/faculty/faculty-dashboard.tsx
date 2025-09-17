@@ -14,6 +14,8 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { Clock, Users, BookOpen, TrendingUp, Calendar, Upload, CheckCircle } from "lucide-react"
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, LineChart, Line } from "recharts"
 import { getCurrentUserClient as getCurrentUser } from "@/lib/auth-client"
+import { useSession } from "next-auth/react"
+import { HODDashboard } from "./hod-dashboard"
 
 // Mock data for faculty dashboard
 const mockFacultyData = {
@@ -46,10 +48,16 @@ const mockFacultyData = {
 }
 
 export function FacultyDashboard() {
+  const { data: session } = useSession()
   const user = getCurrentUser()
   const [selectedClass, setSelectedClass] = useState("CS-A")
   const [selectedSubject, setSelectedSubject] = useState("mathematics")
   const [attendanceData, setAttendanceData] = useState(mockFacultyData.students)
+
+  // Show HOD dashboard if user is HOD
+  if (session?.user?.FacultySubRole === 'hod') {
+    return <HODDashboard />
+  }
 
   const handleAttendanceChange = (studentId: string, present: boolean) => {
     setAttendanceData((prev) =>

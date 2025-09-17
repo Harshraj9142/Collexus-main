@@ -9,7 +9,7 @@ import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import type { UserRole, AdminSubRole } from "@/lib/types"
+import type { UserRole, AdminSubRole, FacultySubRole } from "@/lib/types"
 import { Loader2, GraduationCap, Eye, EyeOff } from "lucide-react"
 
 export function LoginForm() {
@@ -17,6 +17,7 @@ export function LoginForm() {
   const [password, setPassword] = useState("")
   const [selectedRole, setSelectedRole] = useState<UserRole>("student")
   const [selectedAdminSubRole, setSelectedAdminSubRole] = useState<AdminSubRole | "">("")
+  const [selectedFacultySubRole, setSelectedFacultySubRole] = useState<FacultySubRole | "">("")
   const [isLoading, setIsLoading] = useState(false)
   const [error, setError] = useState("")
   const [showPassword, setShowPassword] = useState(false)
@@ -24,7 +25,7 @@ export function LoginForm() {
   const router = useRouter()
   const searchParams = useSearchParams()
 
-  useEffect(() => {
+  useEffect(() =>{
     const message = searchParams?.get('message')
     if (message) {
       setSuccessMessage(message)
@@ -37,6 +38,10 @@ export function LoginForm() {
     if (role !== 'admin') {
       setSelectedAdminSubRole("")
     }
+    // Reset faculty sub-role when role changes from faculty to something else
+    if (role !== 'faculty') {
+      setSelectedFacultySubRole("")
+    }
   }
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -45,6 +50,12 @@ export function LoginForm() {
     // Validate admin sub-role if admin is selected
     if (selectedRole === 'admin' && !selectedAdminSubRole) {
       setError("Please select an admin type")
+      return
+    }
+    
+    // Validate faculty sub-role if faculty is selected
+    if (selectedRole === 'faculty' && !selectedFacultySubRole) {
+      setError("Please select a faculty type")
       return
     }
     
@@ -58,6 +69,7 @@ export function LoginForm() {
         password,
         role: selectedRole,
         adminSubRole: selectedRole === 'admin' ? selectedAdminSubRole : undefined,
+        FacultySubRole: selectedRole === 'faculty' ? selectedFacultySubRole : undefined,
         redirect: false,
       })
 
@@ -122,6 +134,25 @@ export function LoginForm() {
                     <SelectItem value="academic">Academic</SelectItem>
                     <SelectItem value="hostel">Hostel</SelectItem>
                     <SelectItem value="library">Library</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+            )}
+
+            {selectedRole === 'faculty' && (
+              <div className="space-y-2">
+                <Label htmlFor="facultySubRole">Faculty Type</Label>
+                <Select 
+                  value={selectedFacultySubRole} 
+                  onValueChange={(value: FacultySubRole) => setSelectedFacultySubRole(value)}
+                >
+                  <SelectTrigger>
+                    <SelectValue placeholder="Select faculty type" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="hod">HOD</SelectItem>
+                    <SelectItem value="assistant_hod">Assistant HOD</SelectItem>
+                    <SelectItem value="professor">Professor</SelectItem>
                   </SelectContent>
                 </Select>
               </div>

@@ -4,6 +4,7 @@ import { randomUUID } from 'crypto'
 
 export type UserRole = "student" | "faculty" | "admin" | "parent"
 export type AdminSubRole = "financial" | "academic" | "hostel" | "library"
+export type FacultySubRole = "hod" | "assistant_hod" | "professor"
 
 export interface User {
   _id?: string
@@ -13,6 +14,7 @@ export interface User {
   password: string
   role: UserRole
   adminSubRole?: AdminSubRole
+  FacultySubRole?: FacultySubRole
   avatar?: string
   emailVerified?: Date
   createdAt: Date
@@ -25,6 +27,7 @@ export interface UserInput {
   password: string
   role: UserRole
   adminSubRole?: AdminSubRole
+  FacultySubRole?: FacultySubRole
   avatar?: string
 }
 
@@ -45,6 +48,7 @@ export class UserModel {
       password: hashedPassword,
       role: userData.role,
       adminSubRole: userData.adminSubRole,
+      FacultySubRole: userData.FacultySubRole,
       avatar: userData.avatar,
       createdAt: new Date(),
       updatedAt: new Date(),
@@ -69,6 +73,7 @@ export class UserModel {
       password: user.password,
       role: user.role,
       adminSubRole: user.adminSubRole,
+      FacultySubRole: user.FacultySubRole,
       avatar: user.avatar,
       emailVerified: user.emailVerified,
       createdAt: user.createdAt,
@@ -87,6 +92,7 @@ export class UserModel {
       password: user.password,
       role: user.role,
       adminSubRole: user.adminSubRole,
+      FacultySubRole: user.FacultySubRole,
       avatar: user.avatar,
       emailVerified: user.emailVerified,
       createdAt: user.createdAt,

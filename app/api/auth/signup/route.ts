@@ -1,10 +1,19 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { UserInput, UserRole, AdminSubRole } from '@/lib/models/User'
+import { UserInput, UserRole, AdminSubRole, FacultySubRole } from '@/lib/models/User'
 
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json()
     const { name, email, password, role, adminSubRole } = body
+    // Normalize faculty sub-role from various possible casings/keys and values
+    const rawFacultySubRole: unknown =
+      body?.FacultySubRole ?? body?.facultySubRole ?? body?.FACULTY_SUB_ROLE
+    const FacultySubRole =
+      typeof rawFacultySubRole === 'string' ? (rawFacultySubRole as string).toLowerCase() : undefined
+    
+    console.log('Signup request body:', { name, email, role, adminSubRole, FacultySubRole })
+    console.log('Request body keys:', Object.keys(body))
+    console.log('Full body:', body)
 
     // Validate required fields
     if (!name || !email || !password || !role) {
@@ -29,6 +38,19 @@ export async function POST(request: NextRequest) {
       if (!adminSubRole || !validAdminSubRoles.includes(adminSubRole)) {
         return NextResponse.json(
           { error: 'Valid admin sub-role is required for admin users' },
+          { status: 400 }
+        )
+      }
+    }
+
+    // Validate faculty sub-role if role is faculty
+    if (role === 'faculty') {
+      console.log('Faculty validation - FacultySubRole (normalized):', FacultySubRole)
+      const validFacultySubRoles: FacultySubRole[] = ['hod', 'assistant_hod', 'professor']
+      if (!FacultySubRole || !validFacultySubRoles.includes(FacultySubRole as FacultySubRole)) {
+        console.log('Faculty validation failed - FacultySubRole:', FacultySubRole, 'Valid roles:', validFacultySubRoles)
+        return NextResponse.json(
+          { error: 'Valid faculty sub-role is required for faculty users' },
           { status: 400 }
         )
       }
@@ -76,6 +98,7 @@ export async function POST(request: NextRequest) {
         password,
         role,
         adminSubRole: role === 'admin' ? adminSubRole : undefined,
+        FacultySubRole: role === 'faculty' ? (FacultySubRole as FacultySubRole) : undefined,
       }
 
       const newUser = await userModel.createUser(userData)
@@ -114,6 +137,7 @@ export async function POST(request: NextRequest) {
             email,
             role,
             adminSubRole: role === 'admin' ? adminSubRole : undefined,
+            FacultySubRole: role === 'faculty' ? (FacultySubRole as FacultySubRole) : undefined,
             avatar: null
           }
         },
