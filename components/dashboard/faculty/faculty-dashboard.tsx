@@ -16,6 +16,8 @@ import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContaine
 import { getCurrentUserClient as getCurrentUser } from "@/lib/auth-client"
 import { useSession } from "next-auth/react"
 import { HODDashboard } from "./hod-dashboard"
+import { AssistantHODDashboard } from "./assistant-hod-dashboard"
+import { TeacherDashboard } from "./teacher-dashboard"
 
 // Mock data for faculty dashboard
 const mockFacultyData = {
@@ -54,10 +56,17 @@ export function FacultyDashboard() {
   const [selectedSubject, setSelectedSubject] = useState("mathematics")
   const [attendanceData, setAttendanceData] = useState(mockFacultyData.students)
 
-  // Show HOD dashboard if user is HOD
+  // Show dedicated dashboards per faculty sub-role
   if (session?.user?.FacultySubRole === 'hod') {
     return <HODDashboard />
   }
+  if (session?.user?.FacultySubRole === 'assistant_hod') {
+    return <AssistantHODDashboard />
+  }
+  if (session?.user?.FacultySubRole === 'professor') {
+    return <TeacherDashboard />
+  }
+
 
   const handleAttendanceChange = (studentId: string, present: boolean) => {
     setAttendanceData((prev) =>

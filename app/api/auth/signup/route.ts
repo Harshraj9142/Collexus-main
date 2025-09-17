@@ -8,10 +8,14 @@ export async function POST(request: NextRequest) {
     // Normalize faculty sub-role from various possible casings/keys and values
     const rawFacultySubRole: unknown =
       body?.FacultySubRole ?? body?.facultySubRole ?? body?.FACULTY_SUB_ROLE
-    const FacultySubRole =
-      typeof rawFacultySubRole === 'string' ? (rawFacultySubRole as string).toLowerCase() : undefined
+    const normalizeSubRole = (val: unknown): string | undefined => {
+      if (typeof val !== 'string') return undefined
+      // Lowercase, trim, replace spaces and hyphens with underscores
+      return val.trim().toLowerCase().replace(/\s+/g, '_').replace(/-/g, '_')
+    }
+    const facultySubRoleNormalized = normalizeSubRole(rawFacultySubRole)
     
-    console.log('Signup request body:', { name, email, role, adminSubRole, FacultySubRole })
+    console.log('Signup request body:', { name, email, role, adminSubRole, facultySubRoleNormalized })
     console.log('Request body keys:', Object.keys(body))
     console.log('Full body:', body)
 
@@ -45,10 +49,10 @@ export async function POST(request: NextRequest) {
 
     // Validate faculty sub-role if role is faculty
     if (role === 'faculty') {
-      console.log('Faculty validation - FacultySubRole (normalized):', FacultySubRole)
+      console.log('Faculty validation - FacultySubRole (normalized):', facultySubRoleNormalized)
       const validFacultySubRoles: FacultySubRole[] = ['hod', 'assistant_hod', 'professor']
-      if (!FacultySubRole || !validFacultySubRoles.includes(FacultySubRole as FacultySubRole)) {
-        console.log('Faculty validation failed - FacultySubRole:', FacultySubRole, 'Valid roles:', validFacultySubRoles)
+      if (!facultySubRoleNormalized || !validFacultySubRoles.includes(facultySubRoleNormalized as FacultySubRole)) {
+        console.log('Faculty validation failed - FacultySubRole:', facultySubRoleNormalized, 'Valid roles:', validFacultySubRoles)
         return NextResponse.json(
           { error: 'Valid faculty sub-role is required for faculty users' },
           { status: 400 }
@@ -98,7 +102,7 @@ export async function POST(request: NextRequest) {
         password,
         role,
         adminSubRole: role === 'admin' ? adminSubRole : undefined,
-        FacultySubRole: role === 'faculty' ? (FacultySubRole as FacultySubRole) : undefined,
+        FacultySubRole: role === 'faculty' ? (facultySubRoleNormalized as FacultySubRole) : undefined,
       }
 
       const newUser = await userModel.createUser(userData)
@@ -137,7 +141,7 @@ export async function POST(request: NextRequest) {
             email,
             role,
             adminSubRole: role === 'admin' ? adminSubRole : undefined,
-            FacultySubRole: role === 'faculty' ? (FacultySubRole as FacultySubRole) : undefined,
+            FacultySubRole: role === 'faculty' ? (facultySubRoleNormalized as FacultySubRole) : undefined,
             avatar: null
           }
         },

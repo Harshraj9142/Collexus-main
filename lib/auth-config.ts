@@ -67,6 +67,24 @@ const demoUsers = [
     avatar: '/hod-avatar.png'
   },
   {
+    id: '9',
+    name: 'Dr. Alex Assistant HOD',
+    email: 'assistant_hod@demo.com',
+    password: '$2a$12$LQv3c1yqBWVHxkd0LHAkCOYz6TtxMQJqhN8/LewdBPj4J/8K5K5K2', // password: assistant123
+    role: 'faculty' as UserRole,
+    FacultySubRole: 'assistant_hod' as FacultySubRole,
+    avatar: '/assistant-hod-avatar.png'
+  },
+  {
+    id: '10',
+    name: 'Prof. Alan Teacher',
+    email: 'professor@demo.com',
+    password: '$2a$12$LQv3c1yqBWVHxkd0LHAkCOYz6TtxMQJqhN8/LewdBPj4J/8K5K5K2', // password: teacher123
+    role: 'faculty' as UserRole,
+    FacultySubRole: 'professor' as FacultySubRole,
+    avatar: '/teacher-avatar.png'
+  },
+  {
     id: '4',
     name: 'Parent User',
     email: 'parent@demo.com',
@@ -93,6 +111,21 @@ export const authOptions: NextAuthOptions = {
         }
 
         try {
+          // Normalize faculty sub-role from various possible casings/keys and values
+          const credObj = credentials as unknown as Record<string, unknown>
+          const rawFacultySubRole: unknown =
+            credObj?.FacultySubRole ??
+            credObj?.facultySubRole ??
+            credObj?.FACULTY_SUB_ROLE ??
+            credObj?.facultyType ??
+            credObj?.Faculty_Type ??
+            credObj?.subRole
+          const normalizeSubRole = (val: unknown): string | undefined => {
+            if (typeof val !== 'string') return undefined
+            return val.trim().toLowerCase().replace(/\s+/g, '_').replace(/-/g, '_')
+          }
+          const facultySubRoleNormalized = normalizeSubRole(rawFacultySubRole)
+
           // Try MongoDB first
           try {
             const { getMongoClientPromise } = await import('./mongodb')
@@ -126,8 +159,8 @@ export const authOptions: NextAuthOptions = {
             }
 
             // For faculty users, also check faculty sub-role
-            if (user.role === 'faculty' && credentials.FacultySubRole) {
-              if (user.FacultySubRole !== credentials.FacultySubRole) {
+            if (user.role === 'faculty' && facultySubRoleNormalized) {
+              if (user.FacultySubRole !== facultySubRoleNormalized) {
                 return null
               }
             }
@@ -157,11 +190,11 @@ export const authOptions: NextAuthOptions = {
             }
 
             // For faculty users, also match faculty sub-role
-            if (credentials.role === 'faculty' && credentials.FacultySubRole) {
+            if (credentials.role === 'faculty' && facultySubRoleNormalized) {
               user = demoUsers.find(u => 
                 u.email === credentials.email && 
                 u.role === credentials.role && 
-                u.FacultySubRole === credentials.FacultySubRole
+                u.FacultySubRole === facultySubRoleNormalized
               )
             }
             

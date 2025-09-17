@@ -106,7 +106,7 @@ export function LoginForm() {
           <form onSubmit={handleSubmit} className="space-y-4">
             <div className="space-y-2">
               <Label htmlFor="role">Select Role</Label>
-              <Select value={selectedRole} onValueChange={handleRoleChange}>
+              <Select value={selectedRole} onValueChange={(value) => handleRoleChange(value as UserRole)}>
                 <SelectTrigger>
                   <SelectValue placeholder="Select your role" />
                 </SelectTrigger>
@@ -124,7 +124,7 @@ export function LoginForm() {
                 <Label htmlFor="adminSubRole">Admin Type</Label>
                 <Select 
                   value={selectedAdminSubRole} 
-                  onValueChange={(value: AdminSubRole) => setSelectedAdminSubRole(value)}
+                  onValueChange={(value) => setSelectedAdminSubRole(value as AdminSubRole)}
                 >
                   <SelectTrigger>
                     <SelectValue placeholder="Select admin type" />
@@ -144,7 +144,7 @@ export function LoginForm() {
                 <Label htmlFor="facultySubRole">Faculty Type</Label>
                 <Select 
                   value={selectedFacultySubRole} 
-                  onValueChange={(value: FacultySubRole) => setSelectedFacultySubRole(value)}
+                  onValueChange={(value) => setSelectedFacultySubRole(value as FacultySubRole)}
                 >
                   <SelectTrigger>
                     <SelectValue placeholder="Select faculty type" />
