@@ -7,6 +7,7 @@ declare module "next-auth" {
       id: string
       role: UserRole
       adminSubRole?: AdminSubRole
+      FacultySubRole?: FacultySubRole
       avatar?: string
     } & DefaultSession["user"]
   }
@@ -15,6 +16,7 @@ declare module "next-auth" {
     id: string
     role: UserRole
     adminSubRole?: AdminSubRole
+    FacultySubRole?: FacultySubRole
     avatar?: string
   }
 }
@@ -23,6 +25,7 @@ declare module "next-auth/jwt" {
   interface JWT {
     role: UserRole
     adminSubRole?: AdminSubRole
+    FacultySubRole?: FacultySubRole
     avatar?: string
   }
 }

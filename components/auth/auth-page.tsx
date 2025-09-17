@@ -21,7 +21,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select"
-import type { UserRole, AdminSubRole } from "@/lib/types"
+import type { UserRole, AdminSubRole, FacultySubRole } from "@/lib/types"
 import { Loader2, GraduationCap, Eye, EyeOff } from "lucide-react"
 
 export function AuthForm() {
@@ -45,6 +45,7 @@ export function AuthForm() {
   // --- Role states ---
   const [selectedRole, setSelectedRole] = useState<UserRole>("student")
   const [selectedAdminSubRole, setSelectedAdminSubRole] = useState<AdminSubRole | "">("")
+  const [selectedFacultySubRole, setSelectedFacultySubRole] = useState<FacultySubRole | "">("")
 
   useEffect(() => {
     const message = searchParams?.get("message")
@@ -82,6 +83,8 @@ export function AuthForm() {
           role: selectedRole,
           adminSubRole:
             selectedRole === "admin" ? selectedAdminSubRole : undefined,
+          facultySubRole:
+            selectedRole === "faculty" ? selectedFacultySubRole : undefined,
           redirect: false,
         })
 
@@ -115,6 +118,11 @@ export function AuthForm() {
           setIsLoading(false)
           return
         }
+        if (selectedRole === "faculty" && !selectedFacultySubRole) {
+          setError("Faculty sub-role is required for faculty users")
+          setIsLoading(false)
+          return
+        }
 
         const response = await fetch("/api/auth/signup", {
           method: "POST",
@@ -126,6 +134,8 @@ export function AuthForm() {
             role: selectedRole,
             adminSubRole:
               selectedRole === "admin" ? selectedAdminSubRole : undefined,
+            FacultySubRole:
+              selectedRole === "faculty" ? selectedFacultySubRole : undefined,
           }),
         })
 
@@ -278,6 +288,26 @@ export function AuthForm() {
                                     <SelectItem value="academic">Academic</SelectItem>
                                     <SelectItem value="hostel">Hostel</SelectItem>
                                     <SelectItem value="library">Library</SelectItem>
+                                </SelectContent>
+                            </Select>
+                        </motion.div>
+                    )}
+                     {/* Faculty SubRole */}
+                     {selectedRole === "faculty" && (
+                        <motion.div
+                            initial={{ opacity: 0, height: 0 }}
+                            animate={{ opacity: 1, height: "auto" }}
+                            exit={{ opacity: 0, height: 0 }}
+                            transition={{ duration: 0.3 }}
+                            className="space-y-2 overflow-hidden"
+                        >
+                            <Label htmlFor="FacultySubRole" className="text-sm font-medium">Faculty Type</Label>
+                            <Select value={selectedFacultySubRole} onValueChange={(val: FacultySubRole) => setSelectedFacultySubRole(val)}>
+                                <SelectTrigger className="h-10"><SelectValue placeholder="Select faculty type" /></SelectTrigger>
+                                <SelectContent>
+                                    <SelectItem value="HOD">HOD</SelectItem>
+                                    <SelectItem value="Assistant HOD">Assistant HOD</SelectItem>
+                                    <SelectItem value="Professor">Professor</SelectItem>
                                 </SelectContent>
                             </Select>
                         </motion.div>
