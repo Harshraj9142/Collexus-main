@@ -36,7 +36,7 @@ export function DashboardLayout({ children }: DashboardLayoutProps) {
   }
 
   return (
-    <div className="flex h-screen bg-background">
+    <div className="flex h-screen bg-gray-50">
      
 
       
@@ -45,7 +45,7 @@ export function DashboardLayout({ children }: DashboardLayoutProps) {
       <div className="flex flex-1 flex-col overflow-hidden">
         <Navbar onMenuClickAction={() => setMobileMenuOpen(!mobileMenuOpen)} />
 
-        <main className="flex-1 overflow-y-auto p-6">
+        <main className="flex-1 overflow-y-auto p-1">
           <div className="mx-auto max-w-7xl">{children}</div>
         </main>
       </div>

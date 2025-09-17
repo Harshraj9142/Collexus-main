@@ -7,6 +7,6 @@ export default async function HomePage() {
   if (user) {
     redirect(`/dashboard/${user.role}`)
   } else {
-    redirect('/auth/signup')
+    redirect('/auth/auth-pg')
   }
 }

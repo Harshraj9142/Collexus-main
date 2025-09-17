@@ -140,7 +140,7 @@ export function AcademicDashboard() {
     <div className="space-y-6">
       {/* Welcome Section */}
       <div className="flex flex-col gap-2">
-        <h1 className="text-3xl font-bold text-balance">Academic Dashboard</h1>
+        <h1 className="text-5xl mt-3 font-bold text-balance">Academic Dashboard</h1>
         <p className="text-muted-foreground text-pretty">
           Welcome, {session?.user?.name}! Manage academic operations, student records, and educational analytics.
         </p>

@@ -1,7 +1,7 @@
 "use client"
 
 import { useState } from "react"
-import { Bell, Menu, LogOut, User, Settings } from "lucide-react"
+import { Bell, Menu, LogOut, User, Settings, GraduationCap } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import {
@@ -24,7 +24,7 @@ export function Navbar({ onMenuClickAction }: NavbarProps) {
   const { data: session } = useSession()
 
   const handleLogout = () => {
-    signOut({ callbackUrl: "/auth/signin" })
+    signOut({ callbackUrl: "/auth/auth-pg" })
   }
 
   const getInitials = (name: string) => {
@@ -46,8 +46,9 @@ export function Navbar({ onMenuClickAction }: NavbarProps) {
   }
 
   return (
-    <header className="sticky top-0 z-50 w-full bg-white">
-      <div className="flex h-16 items-center px-4 gap-4 max-w-7xl mx-auto">
+    <header className="sticky top-0 z-50 w-full h-fit pb-2 bg-gray-50 shadow-md">
+
+      <div className="flex h-fit pt-2 pb-0 items-center px-4 gap-4 max-w-7xl mx-auto">
         {/* Mobile menu button */}
         <Button
           variant="ghost"
@@ -60,10 +61,11 @@ export function Navbar({ onMenuClickAction }: NavbarProps) {
 
         {/* Logo */}
         <div className="flex items-center gap-2">
-          <div className="h-8 w-8 bg-primary rounded-lg flex items-center justify-center">
-            <span className="text-primary-foreground font-bold text-sm">CE</span>
+          <div className="h-8 w-8 bg-primary rounded-lg p-2 flex items-center justify-center">
+            {/* <span className="text-primary-foreground font-bold text-sm">CE</span> */}
+            <GraduationCap className="text-primary-foreground font-bold text-3xl"/>
           </div>
-          <span className="font-semibold text-lg hidden sm:block">
+          <span className="font-bold text-2xl pl-1 hidden sm:block">
             College ERP
           </span>
         </div>
